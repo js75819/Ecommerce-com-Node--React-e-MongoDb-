@@ -20,5 +20,5 @@ const ProdutoSchema = Schema({
 }, { timestamps:true })
 
 ProdutoSchema.plugin(mongoosePaginate);
-
+ProdutoSchema.index({ titulo: "text", descricao: "text", sku: "text" })
 module.exports = mongoose.model("Produto", ProdutoSchema);
