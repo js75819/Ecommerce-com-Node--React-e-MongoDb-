@@ -22,7 +22,7 @@
     "joi-date-extensions": "^1.2.0",
     "jsonwebtoken": "^8.4.0",
     "moment": "^2.23.0",
-    "mongoose": "^5.4.0",
+    "mongoose": "^5.9.19",
     "mongoose-paginate": "^5.0.3",
     "mongoose-unique-validator": "^2.0.2",
     "morgan": "^1.9.1",

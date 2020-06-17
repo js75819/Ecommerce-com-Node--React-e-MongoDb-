@@ -8,7 +8,7 @@ const EntregaSchema = Schema({
     tipo: { type: String, required: true },
     custo: { type: Number, required: true },
     prazo: { type: Number, required: true },
-    endereco: {
+    /*endereco: {
         type: {
             local: { type: String, required: true },
             numero: { type: String, required: true },
@@ -19,7 +19,7 @@ const EntregaSchema = Schema({
             CEP: { type: String, required: true }
         },
         required: true
-    },
+    },*/
     pedido: { type: Schema.Types.ObjectId, ref: "Pedido", required: true },
     loja: { type: Schema.Types.ObjectId, ref: "Loja", required: true },
     payload: { type: Object }

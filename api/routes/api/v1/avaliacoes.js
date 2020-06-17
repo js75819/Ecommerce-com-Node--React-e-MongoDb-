@@ -16,5 +16,4 @@ router.post("/", auth.required, Validation(AvaliacaoValidation.store), avaliacao
 
 // ADMIN
 router.delete("/:id", auth.required, LojaValidation.admin, Validation(AvaliacaoValidation.remove), avaliacaoController.remove);
-
 module.exports = router;

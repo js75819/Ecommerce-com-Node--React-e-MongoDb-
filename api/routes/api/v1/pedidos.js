@@ -11,21 +11,30 @@ const pedidoController = new PedidoController();
 
 // ADMIN
 router.get("/admin", auth.required, LojaValidation.admin, Validation(PedidoValidation.indexAdmin), pedidoController.indexAdmin);
-router.get("/admin/:id", auth.required, LojaValidation.admin, Validation(PedidoValidation.showAdmin), pedidoController.showAdmin);
+router.get("/admin/:id", auth.required, LojaValidation.admin,Validation(PedidoValidation.showAdmin), pedidoController.showAdmin);
 
-router.delete("/admin/:id", auth.required, LojaValidation.admin, Validation(PedidoValidation.removeAdmin), pedidoController.removeAdmin);
+router.delete("/admin/:id", auth.required, LojaValidation.admin,Validation(PedidoValidation.removeAdmin), pedidoController.removeAdmin);
+
+
 
 // -- carrinho
 router.get("/admin/:id/carrinho", auth.required, LojaValidation.admin, Validation(PedidoValidation.showCarrinhoPedidoAdmin), pedidoController.showCarrinhoPedidoAdmin);
 
-// CLIENTE
-router.get("/", auth.required, Validation(PedidoValidation.index), pedidoController.index);
-router.get("/:id", auth.required, Validation(PedidoValidation.show), pedidoController.show);
+// -- entrega
 
-router.post("/", auth.required, Validation(PedidoValidation.store), pedidoController.store);
-router.delete("/:id", auth.required, Validation(PedidoValidation.remove), pedidoController.remove);
+// -- pagamento
+
+
+// CLIENTE
+router.get("/", auth.required,  Validation(PedidoValidation.indexAdmin), pedidoController.index);
+router.get("/:id", auth.required,  Validation(PedidoValidation.showAdmin), pedidoController.show);
+router.post("/", auth.required,  Validation(PedidoValidation.showAdmin), pedidoController.store);
+router.delete("/:id", auth.required,  Validation(PedidoValidation.removeAdmin), pedidoController.remove);
 
 // -- carrinho
-router.get("/:id/carrinho", auth.required, Validation(PedidoValidation.showCarrinhoPedido), pedidoController.showCarrinhoPedido);
+router.get("/:id/carrinho", auth.required,  Validation(PedidoValidation.showCarrinhoPedidoAdmin), pedidoController.showCarrinhoPedido);
 
+// -- entrega
+
+// -- pagamento
 module.exports = router;

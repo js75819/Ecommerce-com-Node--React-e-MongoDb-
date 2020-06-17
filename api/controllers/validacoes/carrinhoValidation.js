@@ -31,10 +31,10 @@ const getLojaValue = async (carrinho) => {
     return { precoTotal, quantidade };
 }
 
-const CarrinhoValidation = async (carrinho) => {
+/*const*/ async function CarrinhoValidation(carrinho)  {
     const { precoTotal: precoTotalCarrinho, quantidade: quantidadeTotalCarrinho } = getCarrinhoValue(carrinho);
     const { precoTotal: precoTotalLoja, quantidade: quantidadeTotalLoja } = await getLojaValue(carrinho);
-    console.log(precoTotalCarrinho, quantidadeTotalCarrinho, precoTotalLoja, quantidadeTotalLoja)
+    //console.log(precoTotalCarrinho, quantidadeTotalCarrinho, precoTotalLoja, quantidadeTotalLoja)
     return precoTotalCarrinho === precoTotalLoja && quantidadeTotalCarrinho === quantidadeTotalLoja;
 }
 
