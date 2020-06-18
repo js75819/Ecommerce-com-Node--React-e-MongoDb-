@@ -82,7 +82,7 @@ const PedidoValidation = {
             }).required(),
             entrega: Joi.object({
                 custo: Joi.number().required(),
-                //tipo: Joi.string().required(),
+                tipo: Joi.string().required(),
                 prazo: Joi.number().required(),
                 //endereco: Joi.object({
                    //local: Joi.string().required(),

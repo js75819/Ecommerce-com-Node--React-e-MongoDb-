@@ -177,7 +177,6 @@ class PedidoController {
         try {   
             // CHECAR DADOS DO CARRINHO
             if(!await CarrinhoValidation(carrinho)) return res.status(422).send({ error: "Carrinho Inválido" });
-
             //const cliente = await Cliente.findOne({ usuario: req.payload.id }).populate({path:"usuario", select:"_id nome email"});
 
            // if(!await QuantidadeValidation.validarQuantidadeDisponivel(carrinho)) return res.status(400).send({ error: "Produtos não tem quantidade disponivel" });
@@ -200,13 +199,15 @@ class PedidoController {
                 //enderecoEntregaIgualCobranca: pagamento.enderecoEntregaIgualCobranca,
                 papyload: pagamento,
                 loja
+                
             });
+            
 
             const novaEntrega = new Entrega ({
                 status: "nao_iniciado",
                 custo: entrega.custo,
                 prazo: entrega.prazo,
-                //tipo: entrega.tipo,
+                tipo: entrega.tipo,
                 //endereco: entrega.endereco,
                 payload: entrega,
                 loja
