@@ -1,17 +1,17 @@
 const mongoose = require("mongoose");
 
 const Pedido = mongoose.model("Pedido");
-//const Usuario = mongoose.model("Usuario");
+const Usuario = mongoose.model("Usuario");
 const Produto = mongoose.model("Produto");
 const Variacao = mongoose.model("Variacao");
 const Pagamento = mongoose.model("Pagamento");
 const Entrega = mongoose.model("Entrega");
 const Cliente = mongoose.model("Cliente");
-//const RegistroPedido = mongoose.model("RegistroPedido");
+const RegistroPedido = mongoose.model("RegistroPedido");
 
-//onst { calcularFrete } = require("./integracoes/correios");
+const { calcularFrete } = require("./integracoes/correios");
 //const PagamentoValidation = require("./validacoes/pagamentoValidation");
-//const EntregaValidation = require("./validacoes/entregaValidation");
+const EntregaValidation = require("./validacoes/entregaValidation");
 //const QuantidadeValidation = require("./validacoes/quantidadeValidation");
 
 //const EmailController = require("./EmailController");
@@ -58,8 +58,8 @@ class PedidoController {
                 item.variacao = await Variacao.findById(item.variacao);
                 return item;
             }));
-           // const registros = await RegistroPedido.find({ pedido: pedido._id });
-            return res.send({ pedido/*, registros*/ });
+            const registros = await RegistroPedido.find({ pedido: pedido._id });
+            return res.send({ pedido,registros });
         }catch(e){
             next(e);
         }
@@ -72,6 +72,13 @@ class PedidoController {
             const pedido = await Pedido.findOne({ loja: req.query.loja, _id: req.params.id })
             if(!pedido) return res.status(400).send({ error: "Pedido não encontrado" });
             pedido.cancelado = true;
+
+            const registroPedido = new RegistroPedido({
+                pedido: pedido._id,
+                tipo: "pedido",
+                situacao: "pedido_cancelado"
+            });
+            await registroPedido.save();
             
             await pedido.save();
 
@@ -127,7 +134,7 @@ class PedidoController {
     async index (req, res, next){
         const { offset, limit, loja } = req.query;
         try {
-            const cliente = await Cliente.findById({ usuario: req.payload.id });
+            const cliente = await Cliente.findOne({ usuario: req.payload.id });
             const pedidos = await Pedido.paginate(
                 { loja, cliente: cliente._id }, 
                 { 
@@ -153,7 +160,7 @@ class PedidoController {
     // get /:id show
     async show(req,res,next){
         try {
-            //const cliente = await Cliente.findOne({ usuario: req.payload.id });
+            const cliente = await Cliente.findOne({ usuario: req.payload.id });
             const pedido = await Pedido
                                     .findOne({ cliente: cliente._id, _id: req.params.id })
                                     .populate(["cliente","pagamento","entrega"/*,"loja"*/]);
@@ -162,8 +169,8 @@ class PedidoController {
                 item.variacao = await Variacao.findById(item.variacao);
                 return item;
             }));
-            //const registros = await RegistroPedido.find({ pedido: pedido._id });
-            return res.send({ pedido/*, registros*/ });
+            const registros = await RegistroPedido.find({ pedido: pedido._id });
+            return res.send({ pedido, registros });
         }catch(e){
             next(e);
         }
@@ -178,16 +185,16 @@ class PedidoController {
             // CHECAR DADOS DO CARRINHO
             if(!await CarrinhoValidation(carrinho)) return res.status(422).send({ error: "Carrinho Inválido" });
             //const cliente = await Cliente.findOne({ usuario: req.payload.id }).populate({path:"usuario", select:"_id nome email"});
-
-           // if(!await QuantidadeValidation.validarQuantidadeDisponivel(carrinho)) return res.status(400).send({ error: "Produtos não tem quantidade disponivel" });
+            const cliente = await Cliente.findOne({usuario: req.payload.id})
+           //if(!await QuantidadeValidation.validarQuantidadeDisponivel(carrinho)) return res.status(400).send({ error: "Produtos não tem quantidade disponivel" });
 
             // CHECAR DADOS DE ENTREGA
-            //if(!await EntregaValidation(carrinho, entrega)) /*.checarValorPrazo(cliente.endereco.CEP, carrinho, entrega))*/ return res.status(422).send({ error: "Dados de Entrega Inválidos" });
+            if(!await EntregaValidation.checarValorPrazo(cliente.endereco.CEP, carrinho, entrega)) return res.status(422).send({ error: "Dados de Entrega Inválidos" });
 
             // CHECAR DADOS DO PAGAMENTO
             //if(!await PagamentoValidation(carrinho, pagamento))/*.checarValorTotal({carrinho, entrega, pagamento}))*/ return res.status(422).send({ error: "Dados de Pagamento Inválidos" });
            // if(!PagamentoValidation.checarCartao(pagamento)) return res.status(422).send({ error: "Dados de Pagamento com Cartao Inválidos" });
-            const cliente = await Cliente.findOne({usuario: req.payload.id})
+           
 
             const novoPagamento = new Pagamento({
                 valor: pagamento.valor,
@@ -229,13 +236,13 @@ class PedidoController {
 
            // await QuantidadeValidation.atualizarQuantidade("salvar_pedido", pedido);
 
-            /*const registroPedido = new RegistroPedido({
+            const registroPedido = new RegistroPedido({
                 pedido: pedido._id,
                 tipo: "pedido",
                 situacao: "pedido_criado"
             });
             await registroPedido.save();
-
+            /*
             EmailController.enviarNovoPedido({ pedido, usuario: cliente.usuario });
             const administradores = await Usuario.find({ permissao: "admin", loja });
             administradores.forEach((usuario) => {
@@ -251,49 +258,41 @@ class PedidoController {
     // delete /:id remove
     async remove(req,res,next){
         try {
-            const cliente = await Cliente.findById({ usuario: req.payload.id });
+            const cliente = await Cliente.findOne({ usuario: req.payload.id });
             if(!cliente) return res.status(400).send({ error: "Cliente não encontrado" });
             const pedido = await Pedido.findOne({ cliente: cliente._id, _id: req.params.id });
             if(!pedido) return res.status(400).send({ error: "Pedido não encontrado" });
             pedido.cancelado = true;
 
-           /* const registroPedido = new RegistroPedido({
+            const registroPedido = new RegistroPedido({
                 pedido: pedido._id,
                 tipo: "pedido",
                 situacao: "pedido_cancelado"
             });
             await registroPedido.save();
-            
-            const administradores = await Usuario.find({ permissao: "admin", loja: pedido.loja });
-            administradores.forEach((usuario) => {
-                EmailController.cancelarPedido({ pedido, usuario });
-            });*/
 
             await pedido.save();
-
-            //await QuantidadeValidation.atualizarQuantidade("cancelar_pedido", pedido);
 
             return res.send({ cancelado: true });
         }catch(e){
             next(e);
         }
     }
-
-    // get /:id/carrinho showCarrinhoPedido
-    async showCarrinhoPedido(req,res,next){
-        try {
-            const cliente = await Cliente.findById({ usuario: req.payload.id });
-            const pedido = await Pedido.findOne({ cliente: cliente._id, _id: req.params.id });
-            pedido.carrinho = await Promise.all(pedido.carrinho.map(async (item) => {
-                item.produto = await Produto.findById(item.produto);
-                item.variacao = await Variacao.findById(item.variacao);
-                return item;
-            }));
-            return res.send({ carrinho: pedido.carrinho });
-        }catch(e){
-            next(e);
-        }
+// get /:id/carrinho showCarrinhoPedido
+async showCarrinhoPedido(req,res,next){
+    try {
+        const cliente = await Cliente.findOne({ usuario: req.payload.id });
+        const pedido = await Pedido.findOne({ cliente: cliente._id, _id: req.params.id });
+        pedido.carrinho = await Promise.all(pedido.carrinho.map(async (item) => {
+            item.produto = await Produto.findById(item.produto);
+            item.variacao = await Variacao.findById(item.variacao);
+            return item;
+        }));
+        return res.send({ carrinho: pedido.carrinho });
+    }catch(e){
+        next(e);
     }
+}
 
 
 }

@@ -27,7 +27,7 @@ router.get("/admin/:id/carrinho", auth.required, LojaValidation.admin, Validatio
 
 // CLIENTE
 router.get("/", auth.required,  Validation(PedidoValidation.index), pedidoController.index);
-router.get("/:id", auth.required,  Validation(PedidoValidation.show), pedidoController.show);
+router.get("/:id", auth.required, Validation(PedidoValidation.show), pedidoController.show);
 router.post("/", auth.required,  Validation(PedidoValidation.store), pedidoController.store);
 router.delete("/:id", auth.required,  Validation(PedidoValidation.remove), pedidoController.remove);
 
