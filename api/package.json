@@ -16,7 +16,7 @@
     "ejs": "^2.6.1",
     "ember-cli": "^3.18.0",
     "express": "^4.16.4",
-    "express-jwt": "^5.3.1",
+    "express-jwt": "^6.0.0",
     "express-validation": "^1.0.3",
     "faker": "^4.1.0",
     "joi": "^14.3.1",
