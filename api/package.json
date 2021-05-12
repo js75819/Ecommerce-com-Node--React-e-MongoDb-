@@ -32,7 +32,7 @@
     "node-correios": "^2.2.0",
     "node-pagseguro": "^0.1.9",
     "nodejs-pagseguro": "^1.0.9",
-    "nodemailer": "^4.7.0",
+    "nodemailer": "^6.4.16",
     "nodemon": "^1.19.4",
     "pagseguro": "^0.1.0",
     "pagseguro-node": "^1.0.2",
